@@ -1,0 +1,23 @@
+{
+  "fileVersion": 0,
+  "exports": [
+    {
+      "format": "JSONZip",
+      "combine": false,
+      "scaleFactors": [
+        1
+      ],
+      "maxAtlasSize": 2048,
+      "quality": "best",
+      "scale": 1,
+      "textureBorder": 1,
+      "prettyPrint": false,
+      "optimize": "Speed",
+      "name": "default",
+      "scaleFactorsString": "1",
+      "description": "'default' (JSONZip, 100%, @1x)"
+    }
+  ],
+  "exportDir": "../assets/bootstrap",
+  "importDir": ""
+}

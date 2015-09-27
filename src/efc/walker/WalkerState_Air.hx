@@ -6,6 +6,7 @@ import flambe.Disposer;
 import flambe.script.*;
 import flambe.animation.Ease;
 import flambe.animation.AnimatedFloat;
+import flambe.asset.AssetPack;
 
 import deadlyCute.Scaler;
 
@@ -15,9 +16,9 @@ class WalkerState_Air extends WalkerState
 	/* -------------------------------------------------------------
 	/* 
 	------------------------------------------------------------- */
-	public function new(body :BodyBurger, stateManager :WalkerStateManager) :Void
+	public function new(body :BodyBurger, stateManager :WalkerStateManager, pack :AssetPack) :Void
 	{
-		super(body, stateManager);
+		super(body, stateManager, pack);
 	}
 
 	/* -------------------------------------------------------------
@@ -37,6 +38,7 @@ class WalkerState_Air extends WalkerState
 	------------------------------------------------------------- */
 	override public function moveDown(dt :Float, isFresh :Bool) : Void
 	{
+		super.moveDown(dt, isFresh);
 		_body.body.velocity.y += _veclocityDown;
 	}
 

@@ -2,6 +2,7 @@ package efc.walker;
 
 import flambe.Entity;
 import flambe.Component;
+import flambe.asset.AssetPack;
 
 import efc.body.BodyBurger;
 
@@ -12,9 +13,10 @@ class WalkerStateManager extends Component
 	/* -------------------------------------------------------------
 	/* 
 	------------------------------------------------------------- */
-	public function new(body :BodyBurger) : Void
+	public function new(body :BodyBurger, pack :AssetPack) : Void
 	{
 		_body = body;
+		_pack = pack;
 	}
 
 	/* -------------------------------------------------------------
@@ -57,14 +59,15 @@ class WalkerStateManager extends Component
 	{
 		var walkerState :WalkerState;
 		switch (e_state) {
-			case Air: walkerState = new WalkerState_Air(_body, this);
-			case Ground: walkerState = new WalkerState_Ground(_body, this);
+			case Air: walkerState = new WalkerState_Air(_body, this, _pack);
+			case Ground: walkerState = new WalkerState_Ground(_body, this, _pack);
 		}
 		_stateMap.set(e_state, walkerState);
 		e.addChild(new Entity().add(walkerState));
 	}
 
 	private var _body     :BodyBurger;
+	private var _pack     :AssetPack;
 	private var _stateMap = new Map<E_State, WalkerState>();
 }
 

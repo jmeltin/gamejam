@@ -1,23 +1,23 @@
 {
-  "fileVersion": 0,
+  "importDir": "",
+  "fileVersion": 2,
   "exports": [
     {
-      "format": "JSONZip",
+      "format": "JSON",
       "combine": false,
       "scaleFactors": [
         1
       ],
-      "maxAtlasSize": 2048,
-      "quality": "best",
+      "optimize": "Speed",
       "scale": 1,
       "textureBorder": 1,
+      "quality": "best",
       "prettyPrint": false,
-      "optimize": "Speed",
+      "maxAtlasSize": 2048,
       "name": "default",
-      "scaleFactorsString": "1",
-      "description": "'default' (JSONZip, 100%, @1x)"
+      "description": "'default' (JSON, 100%, @1x)",
+      "scaleFactorsString": "1"
     }
   ],
-  "exportDir": "../assets/bootstrap",
-  "importDir": ""
+  "exportDir": "../assets/bootstrap"
 }

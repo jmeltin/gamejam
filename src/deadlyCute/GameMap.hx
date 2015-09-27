@@ -4,11 +4,15 @@ import flambe.Entity;
 import flambe.System;
 import flambe.Component;
 import flambe.asset.AssetPack;
+import flambe.display.ImageSprite;
 import flambe.display.Sprite;
 import flambe.swf.Library;
 import flambe.swf.MoviePlayer;
+import flambe.math.Point;
 
 import efc.body.MovieBody;
+import efc.body.BodyMachine;
+import deadlyCute.paperMachine.Rotater;
 
 class GameMap extends Component {
 
@@ -27,39 +31,59 @@ class GameMap extends Component {
 
 	private function init() : Void
 	{
-		// var map = new MoviePlayer(new Library(_pack, _map)).loop("default");
-		// var matrix = map.movie._.getLayer("player").get(Sprite).getViewMatrix();
-		// var x = System.stage.width/2 - 200;
-		// var y = System.stage.height/2 + 30;
-
-		// map.movie._.setAnchor(x, y);
-		// map.movie._.setXY(x, y);
-
-
-		// // _container.addChild(new Entity().add(new MovieBody(map.movie._.getLayer("banana_1"))));
-		// _container.addChild(new Entity().add(new MovieBody(map.movie._.getLayer("banana_2"))));
-		// // _container.addChild(new Entity().add(new MovieBody(map.movie._.getLayer("banana_3"))));
-		// // _container.addChild(new Entity().add(new MovieBody(map.movie._.getLayer("banana_4"))));
-		// // _container.addChild(new Entity().add(new MovieBody(map.movie._.getLayer("banana_5"))));
-		// // _container.addChild(new Entity().add(new MovieBody(map.movie._.getLayer("banana_6"))));
-	
-		// _container.add(new Sprite().setXY(x, y));
-
 		_container
 			.add(new Sprite())
-			.add(_player = new MoviePlayer(new Library(_pack, _map)).loop("default"));
-		// _player.movie._.setAnchor(0,_player.movie._.getLayer("back").get(Sprite).getNaturalHeight());
+			.add(_mapMovie = new MoviePlayer(new Library(_pack, _map)).loop("default"));
 
-		// _player.movie._.getLayer("banana_1").add(new MovieBody());
-		// _player.movie._.getLayer("banana_2").add(new MovieBody());
-		// _player.movie._.getLayer("banana_3").add(new MovieBody());
-		// _player.movie._.getLayer("banana_4").add(new MovieBody());
-		// _player.movie._.getLayer("banana_5").add(new MovieBody());
-		// _player.movie._.getLayer("banana_6").add(new MovieBody());
+		_mapMovie.movie._.paused = true;
+		
+		var matrix = _mapMovie.movie._.getLayer("burger").get(Sprite).getViewMatrix();
+		_container.get(Sprite).setAnchor(matrix.m02, matrix.m12);
+		_container.get(Sprite).setXY(_position.x, _position.y);
+
+		for(layer in _mapMovie.movie._.symbol.layers) {
+			addLayerBody(layer.name);
+		}
+	}
+
+	private function addLayerBody(name :String) :Void
+	{
+			if(StringTools.startsWith(name, "curve1"))
+				_container.addChild(new Entity().add(new MovieBody(_mapMovie.movie._.getLayer(name), "curve1")));
+			else if(StringTools.startsWith(name, "curve2"))
+				_container.addChild(new Entity().add(new MovieBody(_mapMovie.movie._.getLayer(name), "curve2")));
+			else if(StringTools.startsWith(name, "curve3"))
+				_container.addChild(new Entity().add(new MovieBody(_mapMovie.movie._.getLayer(name), "curve3")));
+			else if(StringTools.startsWith(name, "curve4"))
+				_container.addChild(new Entity().add(new MovieBody(_mapMovie.movie._.getLayer(name), "curve4")));
+			else if(StringTools.startsWith(name, "curve5"))
+				_container.addChild(new Entity().add(new MovieBody(_mapMovie.movie._.getLayer(name), "curve5")));
+			else if(StringTools.startsWith(name, "curve6"))
+				_container.addChild(new Entity().add(new MovieBody(_mapMovie.movie._.getLayer(name), "curve6")));
+			else if(StringTools.startsWith(name, "cat"))
+				_container.addChild(new Entity().add(new MovieBody(_mapMovie.movie._.getLayer(name), "cat")));
+			else if(StringTools.startsWith(name, "iceCastle")) {
+				_container.addChild(new Entity().add(new MovieBody(_mapMovie.movie._.getLayer(name), "iceCastle", true)));
+			}
+	}
+
+	private function addMachine(layer :String, id :String) : Void
+	{
+		_mapMovie.movie._.getLayer(layer)
+			.addChild(new Entity()
+				.add(new ImageSprite(_pack.getTexture(id)))
+				.add(new BodyMachine(id))
+				.add(new Rotater()));
+	}
+
+	public function playerPosition() :Point
+	{
+		return _position;
 	}
 
 	private var _container : Entity = new Entity();
 	private var _pack      : AssetPack;
 	private var _map       : String;
-	private var _player    : MoviePlayer;
+	private var _mapMovie  : MoviePlayer;
+	private var _position  : Point = new Point(300, 300);
 }

@@ -48,12 +48,16 @@ class Debug extends Component
 
 	public function setX(x :Float) : Void
 	{
+	#if flash
 		_debugView.display.x = x;
+	#end
 	}
 
 	public function setY(y :Float) : Void
 	{
+	#if flash
 		_debugView.display.y = y;
+	#end
 	}
 
 }

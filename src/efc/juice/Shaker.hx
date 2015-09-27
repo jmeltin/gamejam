@@ -1,6 +1,7 @@
 package efc.juice;
 
 import flambe.Component;
+import flambe.Entity;
 import flambe.display.Sprite;
 import flambe.script.*;
 import flambe.util.Assert;
@@ -12,9 +13,11 @@ class Shaker extends Component
 	/* -------------------------------------------------------------
 	/* CREATE INSTANCE OF SHAKER
 	------------------------------------------------------------- */
-	public function new(sound :Sound) : Void
+	public function new(sound :Sound, shakeLayer :Entity, backLayer :Entity) : Void
 	{
 		_sound = sound;
+		_shakeLayer = shakeLayer;
+		_backLayer = backLayer;
 	}
 
 	/* -------------------------------------------------------------
@@ -22,8 +25,10 @@ class Shaker extends Component
 	------------------------------------------------------------- */
 	override public function onStart() : Void
 	{
-		_canShake = true;
-		Assert.that(owner.get(Sprite)!=null, "Shaker's owner must contain a sprite :Shaker.hx");
+		var spr = owner.get(Sprite);
+		if(spr == null)
+			owner.add(spr = new Sprite());
+		spr.disablePixelSnapping();
 	}
 
 	/* -------------------------------------------------------------
@@ -31,7 +36,6 @@ class Shaker extends Component
 	------------------------------------------------------------- */
 	override public function onRemoved() : Void
 	{
-		_sound.dispose();
 	}
 
 	/* -------------------------------------------------------------
@@ -42,6 +46,7 @@ class Shaker extends Component
 		if(!_canShake || impulse < MIN_IMPULSE)
 			return;
 
+
 		if(impulse > MAX_IMPULSE)
 			impulse = MAX_IMPULSE;
 
@@ -49,22 +54,34 @@ class Shaker extends Component
 		var shakeX = impulse * SHAKE_X_MAX;
 		var shakeY = impulse * SHAKE_Y_MAX;
 
-		// _sound.play(impulse);
+		_sound.play(impulse);
 
 		owner.add(new Script()).get(Script).run(new Sequence([
-			new Shake(shakeX, shakeY, SHAKE_DURATION),
+			new Parallel([
+				new Shake(shakeX, shakeY, SHAKE_DURATION),
+				new Sequence([
+					new AnimateTo(_shakeLayer.get(Sprite).alpha, 1, SHAKE_DURATION/2),
+					new AnimateTo(_shakeLayer.get(Sprite).alpha, 0, SHAKE_DURATION/2),
+				]),
+				new Sequence([
+					new AnimateTo(_backLayer.get(Sprite).alpha, 1 - impulse, SHAKE_DURATION/2),
+					new AnimateTo(_backLayer.get(Sprite).alpha, 1, SHAKE_DURATION/2),
+				]),
+			]),
 			new CallFunction(function(){
 				_canShake = true;
 			})
 		]));
 	}
 
-	private var _sound    :Sound;
-	private var _canShake :Bool = false;
+	private var _sound      :Sound;
+	private var _shakeLayer :Entity;
+	private var _backLayer  :Entity;
+	private var _canShake   :Bool = true;
 
 	private static inline var MAX_IMPULSE = 1;
-	private static inline var MIN_IMPULSE = 0.2;
-	private static inline var SHAKE_X_MAX = 11;
-	private static inline var SHAKE_Y_MAX = 7;
-	private static inline var SHAKE_DURATION = 0.3333333;
+	private static inline var MIN_IMPULSE = 0.25;
+	private static inline var SHAKE_X_MAX = 20;
+	private static inline var SHAKE_Y_MAX = 18;
+	private static inline var SHAKE_DURATION = 0.5;
 }

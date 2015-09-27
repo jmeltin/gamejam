@@ -19,7 +19,7 @@ import nape.geom.Ray;
 
 class BodyBurger extends Component
 {
-	public var body (default, null) = new nape.phys.Body();
+	public var body : nape.phys.Body;
 	public function new() {}
 
 	/* -------------------------------------------------------------
@@ -51,18 +51,10 @@ class BodyBurger extends Component
 		_sprite = owner.get(ImageSprite);
 		_sprite.disablePixelSnapping();
 
-		var width =  _sprite.texture.width;
-		var height =  _sprite.texture.height;
-		var data = _sprite.texture.readPixels(0, 0, width, height);
-		
-		var poly :GeomPoly = new GeomPoly(BodyTracer.traceTexture(_sprite.texture, 2)).simplify(8);
-		var convexList = poly.convexDecomposition();
-		for(geomPoly in convexList)
-			body.shapes.add(new Polygon(geomPoly));
+		body = BodyLibrary.get("burger");
+		body.align();
 
 		_bodyAnchor.shapes.add(new Polygon(Polygon.box(1,1)));
-
-		body.align();
 
 		var x = body.worldCOM.x;
 		var y = body.worldCOM.y;

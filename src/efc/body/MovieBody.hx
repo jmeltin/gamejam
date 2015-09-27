@@ -1,12 +1,14 @@
 package efc.body;
 
 import flambe.System;
+import flambe.Entity;
 import flambe.Component;
 import flambe.display.Sprite;
 import flambe.display.ImageSprite;
 import flambe.animation.Ease;
 import flambe.util.Assert;
 import flambe.math.FMath;
+import flambe.math.Matrix;
 
 import nape.shape.Polygon;
 import nape.shape.Shape;
@@ -20,37 +22,31 @@ class MovieBody extends Component
 {
 	public var body (default, null): nape.phys.Body;
 
-	public function new() : Void
+	public function new(layer :Entity, name :String, isDangerous :Bool = false) : Void
 	{
-		_bodyContainer = System.root.get(BodyContainer);
-		body = new nape.phys.Body(KINEMATIC);
-	}
-
-	override public function onUpdate(dt :Float) : Void
-	{
-		var matrix = _sprite.getLocalMatrix();
-		var rotation = Math.atan2(-matrix.m01, matrix.m00);
-		body.position = Vec2.weak(matrix.m02 + _offsetX, matrix.m12 + _offsetY);
+		_layer = layer;
+		_isDangerous = isDangerous;
+		body = BodyLibrary.get(name);
+		body.type = nape.phys.BodyType.KINEMATIC;
 	}
 
 	override public function onStart() : Void
 	{
-		_sprite = owner.get(ImageSprite);
-		var poly :GeomPoly = new GeomPoly(BodyTracer.traceTexture(_sprite.texture, 2)).simplify(4);
-		var convexList = poly.convexDecomposition();
-		for(geomPoly in convexList)
-			body.shapes.add(new Polygon(geomPoly));
-		var vMatrix = _sprite.getViewMatrix();
-		var lMatrix = _sprite.getLocalMatrix();
+		var layerSpr = _layer.get(ImageSprite);
 
-		_offsetX = vMatrix.m02 - lMatrix.m02;
-		_offsetY = vMatrix.m12 - lMatrix.m12;
+		var vMatrix = layerSpr.getViewMatrix();
+		var lMatrix = layerSpr.getLocalMatrix();
 
-		_bodyContainer.addBody(body);
+		body.rotation = Math.atan2(-lMatrix.m01, lMatrix.m00);
+		body.position = Vec2.weak(vMatrix.m02, vMatrix.m12);
+		body.setShapeMaterials(nape.phys.Material.ice());
+
+		if(!_isDangerous)
+			owner.getFromParents(BodyContainer).addBody(body);
+		else
+			owner.getFromParents(BodyContainer).addBodyDanger(body);
 	}
 
-	private var _offsetX       : Float;
-	private var _offsetY       : Float;
-	private var _bodyContainer : BodyContainer;
-	private var _sprite        : ImageSprite;
+	private var _layer       : Entity;
+	private var _isDangerous : Bool;
 }

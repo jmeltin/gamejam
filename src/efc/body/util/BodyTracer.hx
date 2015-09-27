@@ -6,22 +6,22 @@ import flambe.util.Assert;
 import haxe.io.Bytes;
 import haxe.ds.Vector;
 import nape.geom.Vec2;
+import flambe.math.Point;
 
 class BodyTracer extends Component
 {
-	public static function traceTexture(texture :Texture, tolerance :Int) :Array<Vec2> 
+	public static function traceTexture(data :Bytes, width :Int, height :Int, tolerance :Int) :Array<Point> 
 	{
-		var data :Bytes = texture.readPixels(0, 0, texture.width, texture.height);
-		var startPoint = getStartingPixel(data, tolerance, texture.width, texture.height);
-		return marchingSquares(data, startPoint, tolerance, texture.width);
+		var startPoint = getStartingPixel(data, tolerance, width, height);
+		return marchingSquares(data, startPoint, tolerance, width);
 	}
 
-	private static function getStartingPixel(data :Bytes, tolerance :Int, width: Int, height :Int) :Vec2 
+	private static function getStartingPixel(data :Bytes, tolerance :Int, width: Int, height :Int) :Point 
 	{
 		for (x in 0...width) {
 			for (y in 0...height) {
 				if(dataValue(data, x, y, width) > tolerance)
-					return new Vec2(x, y);
+					return new Point(x, y);
 			}
 		}
 
@@ -29,7 +29,7 @@ class BodyTracer extends Component
 		return null;
 	}
 
-	private static function getSquareValue(data :Bytes, v :Vec2, tolerance :Int, width :Int) :Int
+	private static function getSquareValue(data :Bytes, v :Point, tolerance :Int, width :Int) :Int
 	{
 		Assert.that(tolerance > -1, "Tolerance must be positive. :BodyTracer.hx getSquareValue()");
 		var squareValue :Int = 0;
@@ -48,10 +48,10 @@ class BodyTracer extends Component
 		return squareValue;
 	}
 
-	private static function marchingSquares(data :Bytes, startV :Vec2, tolerance :Int, width :Int) :Array<Vec2> 
+	private static function marchingSquares(data :Bytes, startV :Point, tolerance :Int, width :Int) :Array<Point> 
 	{
-		var contourVector :Array<Vec2> = new Array<Vec2>();
-		var walkerV = new Vec2(startV.x, startV.y);
+		var contourVector :Array<Point> = new Array<Point>();
+		var walkerV = new Point(startV.x, startV.y);
 		var prevDirection : Direction = null; 
 
 		var closedLoop :Bool = false;
@@ -74,40 +74,39 @@ class BodyTracer extends Component
 				case 13: prevDirection = stepUp(walkerV);
 				case 14: prevDirection = stepLeft(walkerV);
 			}
-			contourVector.push(new Vec2(walkerV.x, walkerV.y));
+			contourVector.push(new Point(walkerV.x, walkerV.y));
 			if (walkerV.x == startV.x && walkerV.y == startV.y)
 				closedLoop=true;
 		}
 
-		startV.dispose();
 		return contourVector;
 	}
 
-	private static function stepLeft(v :Vec2) :Direction
+	private static function stepLeft(v :Point) :Direction
 	{
 		v.x -= 1;
 		return LEFT;
 	}
 
-	private static function stepUp(v :Vec2) :Direction
+	private static function stepUp(v :Point) :Direction
 	{
 		v.y -= 1;
 		return UP;
 	}
 
-	private static function stepRight(v :Vec2) :Direction
+	private static function stepRight(v :Point) :Direction
 	{
 		v.x += 1;
 		return RIGHT;
 	}
 
-	private static function stepDown(v :Vec2) :Direction
+	private static function stepDown(v :Point) :Direction
 	{
 		v.y += 1;
 		return DOWN;
 	}
 
-	private static function handleCase6(prevDir :Direction, v :Vec2) :Direction
+	private static function handleCase6(prevDir :Direction, v :Point) :Direction
 	{
 		if(prevDir == UP) {
 			return stepLeft(v);
@@ -115,7 +114,7 @@ class BodyTracer extends Component
 		return stepRight(v);
 	}
 
-	private static function handleCase9(prevDir :Direction, v :Vec2) :Direction
+	private static function handleCase9(prevDir :Direction, v :Point) :Direction
 	{
 		if(prevDir == RIGHT) {
 			return stepUp(v);

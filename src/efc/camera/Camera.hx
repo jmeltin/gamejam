@@ -28,7 +28,6 @@ class Camera extends Component {
 		owner.addChild(_container);
 
 		_bodyContainer = owner.getFromParents(BodyContainer);
-		trace(_bodyContainer);
 	}
 
 	/* --------------------------------------------------------------
